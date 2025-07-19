@@ -34,67 +34,88 @@ The tool supports both compression (`compress <input> <output>`) and decompressi
 - **Not Ideal for Streaming**: The fixed window limits its ability to handle continuous data streams compared to modern algorithms like Brotli.
 
 ## Compile
-In order to compile the source code, you can use `gcc` in this manner:
+
+### Linux
+
+Use `make` command in the project's root directory to build the project.
 ```
-gcc ./main.c -o lz77
+$ make
 ```
 
-g++:
-```
-g++ ./main.c -o lz77
-```
+### Windows
 
-clang:
+Run the following command in the project's root directory to build the project from the source.
 ```
-clang ./main.c -o lz77
+gcc ./src/*.c main.c -Wall -g -o ./bin/lz7
 ```
 
 ## Usage
-- Compressing a file: `./lz77 -c <file_path>`. 
-- Decompressing a file: `./lz77 -d <file_path>`.
+Use the following flags:
+- `-c`: compress file
+- `-d`: decompress file
+- `-o`: output file path
+- `-w`: sliding window (dictionary) size (default: 16 kb)
+- `-b`: compressed buffer (reader/writer) size (default: 2048 bytes)
+- `-B`: decompressed buffer (chunk reader) size (default: 4096 bytes)
 
 Example:
-- `./lz77 -c c:/picture.bmp`
-- `./lz77 -d ./picture.bmp`
+- `./lz7 -c c:/picture.bmp -o c:/picture.bmp.lz7`
+- `./lz7 -d ./picture.bmp.lz7`
+
+Note: When you don't specify an output when using the `-d` flag to decompress a file, if the file extention is not `.lz7`, it will decompress and **OVERWRITE** the original file.
 
 ## Test
-For testing the program, I have written a test in c, which looks for every file in `test_files` directory and does a compression, decompression and comparison process for each file then prints the result. In order to test this, create `test_files` directory and put some files (i.e bitmap image file) in it, then compile `test.c` or if you're on windows `test-windows.c` and run it.
+
+For testing the program, I have written a test in c, which looks for every file in `test_files` directory and does a compression, decompression and comparison process for each file then prints the result. In order to test this, create `test_files` directory and put some files (i.e bitmap image file) in it, then compile `test.c`. You can use `make test` command if you are on linux.
 
 ```
-[TEST 1-1]: Compressing pic-1024.bmp
-Processing: 3145782/3145782 -> 147135
-Compressed successfully!
-        1 file(s) moved.
-[TEST 1-2]: Decompressing pic-1024.bmp.lz7
-Processing: 147705/147321 -> 3145782
-Decompressed successfully!
-[TEST 1-3]: Verifying pic-1024.bmp
----[TEST 1]: PASSED - Decompressed file matches original
+--------------------------|TEST 01|--------------------------
+[TEST 1/3]: Compressing pic-1024.bmp
+Finished processing (0.419653 s): 3145782 bytes -> 199602 bytes (-93.65%)
 
-[TEST 2-1]: Compressing pic-256.bmp
-Processing: 196662/196662 -> 10455
-Compressed successfully!
-        1 file(s) moved.
-[TEST 2-2]: Decompressing pic-256.bmp.lz7
-Processing: 10512/10482 -> 196662
-Decompressed successfully!
-[TEST 2-3]: Verifying pic-256.bmp
----[TEST 2]: PASSED - Decompressed file matches original
+        --->> Compression completed!
 
-[TEST 3-1]: Compressing pic-64.bmp
-Processing: 12342/12342 -> 3570
-Compressed successfully!
-        1 file(s) moved.
-[TEST 3-2]: Decompressing pic-64.bmp.lz7
-Processing: 3660/3651 -> 12342
-Decompressed successfully!
-[TEST 3-3]: Verifying pic-64.bmp
----[TEST 3]: PASSED - Decompressed file matches original
+[TEST 2/3]: Decompressing pic-1024.bmp.lz7
+Finished Processing (0.132252 s): 199602 bytes -> 3145782 bytes.
 
+        --->> Decompression completed!
+
+[TEST 3/3]: Verifying pic-1024.bmp
+--- [PASSED] - Decompressed file matches original
+
+--------------------------|TEST 02|--------------------------
+[TEST 1/3]: Compressing pic-256.bmp
+Finished processing (0.012253 s): 196662 bytes -> 13812 bytes (-92.98%)
+
+        --->> Compression completed!
+
+[TEST 2/3]: Decompressing pic-256.bmp.lz7
+Finished Processing (0.009301 s): 13812 bytes -> 196662 bytes.
+
+        --->> Decompression completed!
+
+[TEST 3/3]: Verifying pic-256.bmp
+--- [PASSED] - Decompressed file matches original
+
+--------------------------|TEST 03|--------------------------
+[TEST 1/3]: Compressing pic-64.bmp
+Finished processing (0.001368 s): 12342 bytes -> 4128 bytes (-66.55%)
+
+        --->> Compression completed!
+
+[TEST 2/3]: Decompressing pic-64.bmp.lz7
+Finished Processing (0.000657 s): 4128 bytes -> 12342 bytes.
+
+        --->> Decompression completed!
+
+[TEST 3/3]: Verifying pic-64.bmp
+--- [PASSED] - Decompressed file matches original
+
+-------------------------------------------------------------
 Testing complete.
 ```
 
 ## TODO
-- [ ] feature: CLI
-- [ ] Improve performance
+- [x] feature: CLI
+- [x] Improve performance - using hash table
 - [ ] feature: Multi-Threading
